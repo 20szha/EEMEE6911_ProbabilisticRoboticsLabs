@@ -24,6 +24,13 @@ class RobotOpenDoor(Node):
             10
         )
 
+        self.declare_parameter('forward_velocity', 1.0)
+
+        self.log.info(
+            f"Forward velocity parameter: "
+            f"{self.get_parameter('forward_velocity').value}"
+        )
+
         self.state = 'OPEN_DOOR'
         
         self.state_start_time = time.monotonic()
@@ -73,7 +80,7 @@ class RobotOpenDoor(Node):
         msg = TwistStamped()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = 'base_link'
-        msg.twist.linear.x = 1.0
+        msg.twist.linear.x = self.get_parameter('forward_velocity').value
         msg.twist.angular.z = 0.0
         self.cmd_vel_pub.publish(msg)
 
