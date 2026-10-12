@@ -12,6 +12,21 @@ class RobotOpenDoor(Node):
         super().__init__('robot_open_door')
         self.log = self.get_logger()
 
+        self.feature_mean = None
+
+        self.declare_parameter('feature_mean_open_threshold', 250.11764705882354)               # signal seems to hover around 250.11764705882354 when the door is fully open
+        
+        self.feature_mean_open_threshold = (
+            self.get_parameter('feature_mean_open_threshold').value
+        )
+
+        self.feature_mean_sub = self.create_subscription(
+            Float64,
+            '/feature_mean',                                                                    # topic to listen to
+            self.feature_mean_callback,
+            10
+        )
+
         self.cmd_vel_pub = self.create_publisher(                                               # publisher for robot velocity command topic
             TwistStamped,
             '/cmd_vel',
@@ -45,8 +60,9 @@ class RobotOpenDoor(Node):
         if self.state == 'OPEN_DOOR':
             self.open_door()
 
-            if elapsed >= 10.0:
-                    self.change_state('DRIVE_THROUGH')
+            if (self.feature_mean is not None and self.feature_mean <= self.feature_mean_open_threshold):
+                self.get_logger().info(f'Door open detected: feature_mean={self.feature_mean}')
+                self.change_state('DRIVE_THROUGH')
 
         elif self.state == 'DRIVE_THROUGH':
             self.drive_forward()
@@ -96,6 +112,9 @@ class RobotOpenDoor(Node):
         self.state = new_state
         self.state_start_time = time.monotonic()
         self.log.info(f'State: {new_state}')
+
+    def feature_mean_callback(self, msg):
+        self.feature_mean = msg.data
 
 
 def main():
