@@ -14,7 +14,7 @@ class RobotOpenDoor(Node):
 
         self.feature_mean = None
 
-        self.declare_parameter('feature_mean_open_threshold', 275)               # signal seems to hover around 250.11764705882354 when the door is fully open, but we can allow robot to start moving once door is at least halfway open since it will take the robot some time to get to the door and the door will continue to open during that time
+        self.declare_parameter('feature_mean_open_threshold', 250.11764705882354)               # signal seems to hover around 250.11764705882354 when the door is fully open
         
         self.feature_mean_open_threshold = (
             self.get_parameter('feature_mean_open_threshold').value
@@ -67,7 +67,7 @@ class RobotOpenDoor(Node):
         elif self.state == 'DRIVE_THROUGH':
             self.drive_forward()
 
-            if elapsed >= 25.0:
+            if elapsed >= 20.0:
                 self.change_state('STOP')
 
         elif self.state == 'STOP':
