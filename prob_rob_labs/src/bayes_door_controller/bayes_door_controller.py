@@ -10,19 +10,19 @@ class BayesDoorController(Node):
     def __init__(self):
         super().__init__('bayes_door_controller')
 
-        self.declare_parameter('threshold', 321.55)
+        self.declare_parameter('threshold', 321.4572)
 
         '''
             measurement model:
-                P(measured z = open | state x = open) = 0.9417          P(measured z = open | state x = closed) = 0.0631
-                P(measured z = closed | state x = open) = 0.0583        P(measured z = closed | state x = closed) = 0.9369
+                P(measured z = open | state x = open) = 0.9363          P(measured z = open | state x = closed) = 0.0750
+                P(measured z = closed | state x = open) = 0.0637        P(measured z = closed | state x = closed) = 0.9250
         '''
 
         self.declare_parameter('p_success', 0.15714285714)                                                          # probability that the door will open when the robot requests it to open with flaky_door_opener
-        self.declare_parameter('p_z_open_given_open', 0.9417)
-        self.declare_parameter('p_z_open_given_closed', 0.0631)
-        self.declare_parameter('p_z_closed_given_open', 0.0583)
-        self.declare_parameter('p_z_closed_given_closed', 0.9369)
+        self.declare_parameter('p_z_open_given_open', 0.9363)
+        self.declare_parameter('p_z_open_given_closed', 0.0750)
+        self.declare_parameter('p_z_closed_given_open', 0.0637)
+        self.declare_parameter('p_z_closed_given_closed', 0.9250)
 
         '''
             Prior belief:
