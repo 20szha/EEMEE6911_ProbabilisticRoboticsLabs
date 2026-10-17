@@ -37,7 +37,12 @@ def generate_launch_description():
             'p_z_open_given_open': p_z_open_given_open,
             'p_z_open_given_closed': p_z_open_given_closed,
             'p_z_closed_given_open': p_z_closed_given_open,
-            'p_z_closed_given_closed': p_z_closed_given_closed
+            'p_z_closed_given_closed': p_z_closed_given_closed,
+            'initial_belief_open': initial_belief_open,
+            'initial_belief_closed': initial_belief_closed,
+            'belief_threshold': belief_threshold,
+            'command_wait_sec': command_wait_sec,
+            'forward_velocity': forward_velocity
         }]
     )
 
