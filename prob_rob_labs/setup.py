@@ -33,12 +33,17 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'noisy_feature_recorder = noisy_feature_recorder.noisy_feature_recorder:main',
+            'belief_door_detector = belief_door_detector.belief_door_detector:main',
+            'full_bayes_filter = full_bayes_filter.full_bayes_filter:main',
+            'bayes_door_controller = bayes_door_controller.bayes_door_controller:main',
             'robot_open_door = robot_open_door.robot_open_door:main',
             'gz_twist_publisher = gz_twist_publisher.gz_twist_publisher:main',
             'image_mean_feature_x = image_mean_feature_x.image_mean_feature_x:main',
             'flaky_door_opener = flaky_door_opener.flaky_door_opener:main',
             'gz_pose_publisher = gz_pose_publisher.gz_pose_publisher:main',
             'cmd_vel_noise_injector = cmd_vel_noise_injector.cmd_vel_noise_injector:main',
+            'L3a5_noisy_feature_recorder = L3a5_noisy_feature_recorder.L3a5_noisy_feature_recorder:main',
         ],
     }
 )
