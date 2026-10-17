@@ -10,7 +10,7 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     forward_velocity = LaunchConfiguration('forward_velocity', default='1.0')
-    
+    feature_mean_open_threshold = LaunchConfiguration('feature_mean_open_threshold', default='250.11764705882354')
 
     declare_use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
@@ -24,13 +24,20 @@ def generate_launch_description():
         description='Forward velocity of the robot'
     )
 
+    declare_feature_mean_open_threshold_arg = DeclareLaunchArgument(
+        'feature_mean_open_threshold',
+        default_value='250.11764705882354',
+        description='feature_mean threshold before robot decides door is open',
+    )
+
     robot_open_door_cmd = Node(
         package='prob_rob_labs',
         executable='robot_open_door',
         name='robot_open_door',
         parameters=[{
             'use_sim_time': use_sim_time,
-            'forward_velocity': forward_velocity
+            'forward_velocity': forward_velocity,
+            'declare_feature_mean_open_threshold_arg': declare_feature_mean_open_threshold_arg
         }]
     )
 
@@ -38,6 +45,7 @@ def generate_launch_description():
 
     ld.add_action(declare_use_sim_time_arg)
     ld.add_action(declare_forward_velocity_arg)
+    ld.add_action(declare_feature_mean_open_threshold_arg)
     ld.add_action(robot_open_door_cmd)
 
 
