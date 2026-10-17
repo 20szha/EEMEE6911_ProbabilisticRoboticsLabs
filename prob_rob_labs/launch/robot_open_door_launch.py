@@ -37,7 +37,7 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': use_sim_time,
             'forward_velocity': forward_velocity,
-            'declare_feature_mean_open_threshold_arg': declare_feature_mean_open_threshold_arg
+            'feature_mean_open_threshold': feature_mean_open_threshold
         }]
     )
 
