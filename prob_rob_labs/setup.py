@@ -33,6 +33,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'collect_data = collect_data.collect_data:main',
             'noisy_feature_recorder = noisy_feature_recorder.noisy_feature_recorder:main',
             'belief_door_detector = belief_door_detector.belief_door_detector:main',
             'full_bayes_filter = full_bayes_filter.full_bayes_filter:main',
