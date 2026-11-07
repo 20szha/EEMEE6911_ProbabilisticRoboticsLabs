@@ -33,6 +33,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'landmark_estimation = landmark_estimation.landmark_estimation:main',
             'EKFOdometry = EKFOdometry.EKFOdometry:main',
             'collect_data_a3 = collect_data_a3.collect_data_a3:main',
             'collect_data = collect_data.collect_data:main',
