@@ -12,6 +12,9 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     landmark_color = LaunchConfiguration('landmark_color', default='cyan')
     landmark_height = LaunchConfiguration('landmark_height', default='0.5')
+    image_width = LaunchConfiguration('image_width', default='640')
+    image_height = LaunchConfiguration('image_height', default='480')
+    margin = LaunchConfiguration('margin', default='10')
 
     declare_use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
@@ -31,6 +34,24 @@ def generate_launch_description():
         description='Height of the landmark',
     )
 
+    declare_image_width_arg = DeclareLaunchArgument(
+        'image_width',
+        default_value='640',
+        description='Width of the camera image',
+    )
+
+    declare_image_height_arg = DeclareLaunchArgument(
+        'image_height',
+        default_value='480',
+        description='Height of the camera image',
+    )
+
+    declare_margin_arg = DeclareLaunchArgument(
+        'margin',
+        default_value='5',
+        description='Margin from the image boundary',
+    )
+
     landmark_estimation_cmd = Node(
         package='prob_rob_labs',
         executable='landmark_estimation',
@@ -38,7 +59,10 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': use_sim_time,
             'landmark_color': landmark_color,
-            'landmark_height': landmark_height
+            'landmark_height': landmark_height,
+            'image_width': image_width,
+            'image_height': image_height,
+            'margin': margin
         }]
     )
 
@@ -47,7 +71,9 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_arg)
     ld.add_action(declare_landmark_color_arg)
     ld.add_action(declare_landmark_height_arg)
+    ld.add_action(declare_image_width_arg)
+    ld.add_action(declare_image_height_arg)
+    ld.add_action(declare_margin_arg)
     ld.add_action(landmark_estimation_cmd)
-
 
     return ld

@@ -27,9 +27,15 @@ class LandmarkEstimation(Node):
 
         self.declare_parameter('landmark_color', 'cyan')   
         self.declare_parameter('landmark_height', 0.5)
+        self.declare_parameter('image_width', 640)
+        self.declare_parameter('image_height', 480)
+        self.declare_parameter('margin', 10)
 
         self.landmark_color = self.get_parameter('landmark_color').value
         self.landmark_height = self.get_parameter('landmark_height').value
+        self.image_width = self.get_parameter('image_width').value
+        self.image_height = self.get_parameter('image_height').value
+        self.margin = self.get_parameter('margin').value
 
         topic = f'/vision_{self.landmark_color}/corners'                                                # topic of the corners of the landmark to listen to
 
@@ -95,12 +101,20 @@ class LandmarkEstimation(Node):
 
         height_pixels = max_y - min_y
         center_x = (min_x + max_x) / 2.0
+
+        if (min_x <= self.margin or max_x >= self.image_width - self.margin):
+            self.get_logger().warning(f'Landmark is too close to the image boundary for {self.landmark_color}')
+            return
         
         measurement = estimate_distance_bearing(height_pixels, center_x, self.fx, self.fy, self.cx, self.landmark_height)
 
         if measurement is None:
             self.get_logger().warning(f'Failed to estimate distance and bearing for {self.landmark_color}')
             return
+
+        self.get_logger().info(
+            f'Number of detected corners: {len(msg.points)}'
+        )
 
         distance, theta = measurement
 
