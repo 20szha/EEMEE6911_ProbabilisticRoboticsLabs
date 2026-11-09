@@ -4,6 +4,7 @@ from prob_rob_msgs.msg import Point2DArrayStamped
 import math
 from sensor_msgs.msg import CameraInfo
 from std_msgs.msg import Float64
+from geometry_msgs.msg import PoseStamped
 
 # heartbeat_period = 0.1
 
