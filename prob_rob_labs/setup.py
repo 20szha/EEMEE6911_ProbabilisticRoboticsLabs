@@ -15,6 +15,7 @@ data_files=[
     ('share/' + package_name, ['package.xml']),
     (os.path.join('share', package_name, 'worlds'), glob('worlds/*.world')),
     (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+    (os.path.join('share', package_name, 'config'), glob('config/*.json')),
     (os.path.join('share', package_name, 'launch'), launch_files),
 ]
 
@@ -35,6 +36,7 @@ setup(
         'console_scripts': [
             'landmark_measurement_error = landmark_measurement_error.landmark_measurement_error:main',
             'landmark_estimation = landmark_estimation.landmark_estimation:main',
+            'ekf_localization = ekf_localization.ekf_localization:main',
             'EKFOdometry = EKFOdometry.EKFOdometry:main',
             'collect_data_a3 = collect_data_a3.collect_data_a3:main',
             'collect_data = collect_data.collect_data:main',

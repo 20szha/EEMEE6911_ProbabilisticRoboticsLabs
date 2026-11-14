@@ -1,0 +1,25 @@
+{
+  "frame_id": "world",
+  "landmarks": {
+    "red": {
+      "position": {"x": 8.5, "y": -5.0, "z": 0.25},
+      "dimensions": {"radius": 0.1, "height": 0.5}
+    },
+    "green": {
+      "position": {"x": 8.5, "y": 5.0, "z": 0.25},
+      "dimensions": {"radius": 0.1, "height": 0.5}
+    },
+    "yellow": {
+      "position": {"x": -11.5, "y": 5.0, "z": 0.25},
+      "dimensions": {"radius": 0.1, "height": 0.5}
+    },
+    "magenta": {
+      "position": {"x": -11.5, "y": -5.0, "z": 0.25},
+      "dimensions": {"radius": 0.1, "height": 0.5}
+    },
+    "cyan": {
+      "position": {"x": 0.0, "y": 0.0, "z": 0.25},
+      "dimensions": {"radius": 0.1, "height": 0.5}
+    }
+  }
+}
