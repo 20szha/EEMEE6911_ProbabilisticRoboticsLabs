@@ -54,10 +54,10 @@ class EKFLocalization(Node):
                 10,
             )
 
-        self.measured_distance = None
-        self.measured_bearing = None
-        self.robot_pose = None
-        self.landmark_poses = None
+        self.measured_distance = {}
+        self.measured_bearing = {}
+        self.robot_pose = {}
+        self.landmark_poses = {}
 
         self.declare_parameter('image_width', 640)
         self.declare_parameter('image_height', 480)
@@ -185,10 +185,6 @@ class EKFLocalization(Node):
             self.get_logger().error('Camera intrinsic parameters not received')
             return
 
-        if self.camera_info is None:
-            self.get_logger().debug('Waiting for camera calibration')
-            return
-
         min_x = min(point.x for point in msg.points)
         max_x = max(point.x for point in msg.points)
         min_y = min(point.y for point in msg.points)
@@ -214,17 +210,11 @@ class EKFLocalization(Node):
         landmark_y = landmark['position']['y']
         landmark_height = landmark['dimensions']['height']
 
-        self.get_logger().info(
-            f'{landmark_color}: '
-            f'pixel_height={pixel_height}, '
-            f'center_x={center_x}'
-        )
-
         if self.fx <= 0 or self.fy <= 0:
             self.get_logger().warning('Invalid camera calibration')
             return
 
-        measurement = estimate_distance_bearing(height_pixels, center_x, self.fx, self.fy, self.cx, landmark_height)
+        measurement = self.estimate_distance_bearing(height_pixels, center_x, self.fx, self.fy, self.cx, landmark_height)
 
         if measurement is None:
             return
