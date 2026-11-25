@@ -9,7 +9,6 @@ from prob_rob_msgs.msg import Point2DArrayStamped
 from sensor_msgs.msg import CameraInfo
 
 from rclpy.time import Time
-import math
 
 from std_msgs.msg import Float64
 from geometry_msgs.msg import PoseStamped
@@ -37,6 +36,11 @@ class EKFLocalization(Node):
             10,
         )
 
+        self.fx = None
+        self.fy = None
+        self.cx = None
+        self.cy = None
+
         self.vision_subscriptions = {}
 
         for color in self.landmarks:
@@ -54,6 +58,14 @@ class EKFLocalization(Node):
         self.measured_bearing = None
         self.robot_pose = None
         self.landmark_poses = None
+
+        self.declare_parameter('image_width', 640)
+        self.declare_parameter('image_height', 480)
+        self.declare_parameter('margin', 10)
+
+        self.image_width = self.get_parameter('image_width').value
+        self.image_height = self.get_parameter('image_height').value
+        self.margin = self.get_parameter('margin').value
 
         # topic = f'/vision_{self.landmark_color}/corners'                                                # topic of the corners of the landmark to listen to
 
@@ -149,8 +161,29 @@ class EKFLocalization(Node):
             raise KeyError(f'No landmark of color "{color}" is in the map') from error
 
     def vision_corners_callback(self, msg, landmark_color):
+        num_points = len(msg.points)
+
+        self.get_logger().info(
+            f'Received cornerpoints for {landmark_color}: {num_points} points'
+        )
+
+        if num_points == 0:
+            self.get_logger().debug(
+                f'No cornerpoints detected for {landmark_color}'
+            )
+            return
+        
+        self.get_logger().info(
+            f'Received cornerpoints for {landmark_color}: '
+            f'{len(msg.points)} points'
+        )
+        
         if not msg.points:
-        return
+            return
+
+        if self.fx is None or self.fy is None:
+            self.get_logger().error('Camera intrinsic parameters not received')
+            return
 
         if self.camera_info is None:
             self.get_logger().debug('Waiting for camera calibration')
@@ -162,18 +195,76 @@ class EKFLocalization(Node):
         max_y = max(point.y for point in msg.points)
 
         height_pixels = max_y - min_y
+
+        if height_pixels <= 0:
+            self.get_logger().warning(
+                f'Invalid bounding box for {landmark_color}'
+            )
+            return
+
+        if (min_x <= self.margin or max_x >= self.image_width - self.margin or min_y <= self.margin or max_y >= self.image_height - self.margin):
+            self.get_logger().warning(f'{landmark_color} landmark too close to image boundary')
+            return
+
         center_x = (min_x + max_x) / 2.0
 
         landmark = self.get_landmark(landmark_color)
+
+        landmark_x = landmark['position']['x']
+        landmark_y = landmark['position']['y']
         landmark_height = landmark['dimensions']['height']
 
-        fx = self.camera_info.p[0]
-        fy = self.camera_info.p[5]
-        cx = self.camera_info.p[2]
+        self.get_logger().info(
+            f'{landmark_color}: '
+            f'pixel_height={pixel_height}, '
+            f'center_x={center_x}'
+        )
 
-        bearing = math.atan((cx - center_x) / fx)
-        distance = fy * landmark_height / (
-            height_pixels * math.cos(bearing)
+        if self.fx <= 0 or self.fy <= 0:
+            self.get_logger().warning('Invalid camera calibration')
+            return
+
+        measurement = estimate_distance_bearing(height_pixels, center_x, self.fx, self.fy, self.cx, landmark_height)
+
+        if measurement is None:
+            return
+
+        distance, bearing = measurement
+
+        self.get_logger().info(
+            f'Observed {landmark_color} landmark: '
+            f'x={landmark_x:.2f}, y={landmark_y:.2f}, '
+            f'distance={distance:.2f} m, '
+            f'bearing={bearing:.3f} rad'
+        )
+
+    @staticmethod
+    def estimate_distance_bearing(height_pixels, center_x, fx, fy, cx, landmark_height):
+        if height_pixels <= 0:
+            return None
+
+        theta = math.atan((cx - center_x) / fx)
+
+        distance = ((fy * landmark_height) / (height_pixels * math.cos(theta)))
+
+        return distance, theta
+
+    def camera_info_callback(self, msg):
+        self.fx = msg.p[0]
+        self.cx = msg.p[2]
+        self.fy = msg.p[5]
+        self.cy = msg.p[6]
+
+        if self.fx <= 0 or self.fy <= 0:
+            self.get_logger().warning('Invalid camera intrinsic parameters')
+            self.fx = None
+            self.fy = None
+            return
+
+        self.get_logger().info(
+            f'Camera calibration received: '
+            f'fx={self.fx:.2f}, fy={self.fy:.2f}, '
+            f'cx={self.cx:.2f}, cy={self.cy:.2f}'
         )
 
 def main(args=None):
